@@ -43,6 +43,21 @@ class Owner(Base):
     telegram_user_id: Mapped[int] = mapped_column(BigInteger, nullable=False, unique=True)
 
 
+class AdminIdentity(Base):
+    __tablename__ = "admin_identities"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    open_id: Mapped[str] = mapped_column(String(255), nullable=False, unique=True)
+    telegram_user_id: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    bound_at: Mapped[datetime] = mapped_column(DateTime(timezone=False), nullable=False, default=utc_now)
+
+
+class PendingAdminBind(Base):
+    __tablename__ = "pending_admin_binds"
+    code_digest: Mapped[str] = mapped_column(String(64), primary_key=True)
+    open_id: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=False), nullable=False, index=True)
+
+
 class ProcessedUpdate(Base):
     __tablename__ = "processed_updates"
     update_id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
@@ -77,6 +92,9 @@ def make_session_factory(database_url: str | None = None):
             pass
         else:
             raise ValueError("MySQL requires verified TLS; only isolated Compose db may opt out")
+    elif parsed.drivername == "sqlite":
+        # A short, bounded wait lets simultaneous bot/dashboard writes serialize.
+        connect_args["timeout"] = 10
     engine = create_engine(parsed, connect_args=connect_args, pool_pre_ping=True, pool_recycle=300)
     Base.metadata.create_all(engine)
     return sessionmaker(bind=engine, expire_on_commit=False)

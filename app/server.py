@@ -11,6 +11,8 @@ from flask import Flask, jsonify, request, send_from_directory
 from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 
+from app.admin_api import register_admin_api
+from app.admin_auth import register_admin_auth
 from app.bot import process_update, webhook_secret
 from app.storage import make_session_factory
 
@@ -42,6 +44,10 @@ def create_app(*, database_url: str | None = None, bot_token: str | None = None,
     @app.get("/")
     def home():
         return send_from_directory(STATIC_DIR, "index.html")
+
+    @app.get("/admin")
+    def admin_page():
+        return send_from_directory(STATIC_DIR, "admin.html")
 
     @app.get("/static/<path:filename>")
     def static_asset(filename):
@@ -89,6 +95,8 @@ def create_app(*, database_url: str | None = None, bot_token: str | None = None,
                     return "reply delivery failed", 502
         return "ok", 200
 
+    require_admin = register_admin_auth(app, sessions)
+    register_admin_api(app, sessions, require_admin)
     return app
 
 

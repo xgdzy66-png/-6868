@@ -13,7 +13,7 @@ from sqlalchemy.dialects.mysql import insert as mysql_insert
 from sqlalchemy.dialects.sqlite import insert as sqlite_insert
 from sqlalchemy.orm import Session
 
-from app.storage import Movement, Owner, ProcessedUpdate, Product
+from app.storage import AdminIdentity, Movement, Owner, PendingAdminBind, ProcessedUpdate, Product, utc_now
 
 LOCAL_TZ = ZoneInfo("Asia/Bangkok")
 MAX_QTY = 1_000_000_000
@@ -30,6 +30,7 @@ USAGE = (
     "/history [商品ID] — 最近20条出入库记录\n"
     "/stats YYYY-MM-DD YYYY-MM-DD [页码] — 每日统计（UTC+7）\n"
     "/myid — 查看自己的 Telegram ID\n"
+    "/bind 代码 — 确认后台 Manus 登录账号\n"
     "首次使用请在私聊发送 /claim 一次性代码。"
 )
 
@@ -175,6 +176,20 @@ def execute_command(session: Session, text: str, user_id: int, token: str, bot_u
     owner = session.get(Owner, 1)
     if not owner or owner.telegram_user_id != user_id:
         return "无权限访问库存。请由管理员在私聊中操作；首次绑定使用 /claim 一次性代码。"
+
+    if command == "bind":
+        if len(args) != 1 or not re.fullmatch(r"[A-Za-z0-9_-]{20,64}", args[0]):
+            return "用法：/bind 后台页面显示的临时代码"
+        digest = hashlib.sha256(args[0].encode()).hexdigest()
+        pending = session.get(PendingAdminBind, digest, with_for_update=True)
+        if not pending or pending.expires_at < utc_now():
+            return "绑定码无效或已过期，请回到后台重新生成。"
+        bound = session.get(AdminIdentity, 1, with_for_update=True)
+        if bound:
+            return "后台已绑定其他账号，拒绝覆盖。" if bound.open_id != pending.open_id else "该账号已绑定。"
+        session.add(AdminIdentity(id=1, open_id=pending.open_id, telegram_user_id=user_id))
+        session.delete(pending)
+        return "后台绑定成功。请返回网页刷新，即可管理库存。"
 
     if command in {"add", "remove"}:
         if len(args) != 2 or not _valid_id(args[0]) or (qty := _parse_qty(args[1])) is None:

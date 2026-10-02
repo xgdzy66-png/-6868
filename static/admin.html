@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta name="robots" content="noindex, nofollow">
+  <title>库存管理台 · @kucunxbot</title>
+  <meta name="description" content="仅限管理员使用的库存与出入库台账。">
+  <link rel="icon" type="image/png" href="/static/box.png">
+  <link rel="stylesheet" href="/static/admin.css">
+  <script defer src="/static/admin.js"></script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand"><img src="/static/box.png" alt="" width="35" height="35"><div><span class="brand-overline">KUCUN / LEDGER</span><strong>库存管理台</strong></div></div>
+      <div class="sidebar-rule"></div>
+      <div class="sidebar-label">工作空间 <span>01 / ADMIN</span></div>
+      <nav class="side-nav" aria-label="主导航">
+        <a href="#overview"><span class="nav-mark">01</span> 业务概览</a>
+        <a href="#inventory"><span class="nav-mark">02</span> 商品库存</a>
+        <a href="#movements"><span class="nav-mark">03</span> 出入库流水</a>
+        <a href="#statistics"><span class="nav-mark">04</span> 每日统计</a>
+      </nav>
+      <div class="sidebar-bottom"><span class="signal"></span> 与 Telegram 共用一份库存<br><small>所有时间按 UTC+7 显示</small></div>
+    </aside>
+
+    <div class="main-area">
+      <header class="topbar"><span class="topbar-caption">WAREHOUSE OPERATIONS / 库存工作台</span><div class="topbar-actions"><a href="https://t.me/kucunxbot" target="_blank" rel="noopener noreferrer">打开 Telegram ↗</a><button id="logout" type="button" class="text-button" hidden>退出登录</button></div></header>
+      <main>
+        <section id="loading-screen" class="state-panel" aria-live="polite"><div class="loading-dot"></div><p>正在核对管理员身份…</p></section>
+
+        <section id="login-screen" class="auth-layout" hidden>
+          <div class="auth-hero"><p class="eyebrow">PRIVATE INVENTORY / PRIVATE ACCESS</p><h1>库存，<br><em>一眼有数。</em></h1><p class="lead">从商品现存到每笔出入库，只有经过授权的管理员才能查看与操作。</p><div class="hero-line"><span>MANUS 登录</span><span>TELEGRAM 所有者确认</span></div></div>
+          <div class="auth-card"><span class="step-number">01 — 身份验证</span><h2>进入管理台</h2><p>先使用 Manus 账号登录，再由已认领机器人的 Telegram 管理员确认一次性绑定码。</p><button id="login-button" class="button button-primary" type="button">使用 Manus 账号登录 <span>↗</span></button><p id="iframe-tip" class="subtle" hidden>如果你在嵌入预览中，请先在新标签页打开后台后再登录。</p><a class="secondary-link" href="/admin" target="_blank" rel="noopener noreferrer">在新标签页打开后台 ↗</a><div class="privacy-note">安全说明：网页不存放 Bot Token，未授权账号无法读取库存。</div></div>
+        </section>
+
+        <section id="bind-screen" class="auth-layout" hidden>
+          <div class="auth-hero"><p class="eyebrow">ACCOUNT LINK / 管理员授权</p><h1>最后一步，<br><em>确认归属。</em></h1><p class="lead">你已登录 Manus。为避免其他账号接管库存，请用机器人现有管理员的 Telegram 私聊完成绑定。</p><div class="hero-line"><span>代码仅 5 分钟有效</span><span>绑定一次即可</span></div></div>
+          <div class="auth-card"><span class="step-number">02 — Telegram 确认</span><h2>绑定管理员账号</h2><p>使用已认领机器人的 Telegram 账号，向 <strong>@kucunxbot</strong> 私聊发送下面的命令。</p><div id="link-taken" class="notice" hidden>该后台已绑定其他 Manus 账号。为保护库存，不能在网页上覆盖绑定。</div><div id="bind-form"><button id="generate-bind" class="button button-primary" type="button">生成绑定命令</button><div id="bind-code-wrap" class="code-panel" hidden><code id="bind-code"></code><button id="copy-bind" type="button" class="small-button">复制</button></div><p id="bind-countdown" class="subtle" aria-live="polite"></p><a href="https://t.me/kucunxbot" target="_blank" rel="noopener noreferrer" class="secondary-link">打开机器人私聊 ↗</a><button id="check-bind" class="button button-light" type="button">已发送，检查绑定</button></div><div class="privacy-note">只有原 Telegram 管理员可以完成绑定；轮换 Bot Token 不会解除授权。</div></div>
+        </section>
+
+        <div id="dashboard" hidden>
+          <section id="overview" class="page-heading"><div><p class="eyebrow">LIVE INVENTORY / 实时库存</p><h1>今天的库存，<em>看得清楚。</em></h1><p class="lead">库存与 Telegram 机器人实时同步。每次操作，都会留在台账里。</p></div><div class="heading-stamp"><span>当前日期 · UTC+7</span><strong id="current-date">—</strong><small id="account-name">已授权管理员</small></div></section>
+
+          <section class="metrics" aria-label="库存摘要"><div class="metric"><span class="metric-index">01 / SKU</span><strong id="sku-count">—</strong><span>在库商品种类</span></div><div class="metric"><span class="metric-index">02 / TOTAL</span><strong id="total-units">—</strong><span>当前库存总件数</span></div><div class="metric metric-in"><span class="metric-index">03 / TODAY IN</span><strong id="today-in">—</strong><span>今日入库 · UTC+7</span></div><div class="metric metric-out"><span class="metric-index">04 / TODAY OUT</span><strong id="today-out">—</strong><span>今日出库 · UTC+7</span></div></section>
+
+          <section id="inventory" class="section-block"><div class="section-header"><div><span class="section-index">01 / INVENTORY</span><h2>商品库存</h2><p>按商品 ID 管理库存；新增商品会在首次入库时自动建立。</p></div><span class="section-tag">实时同步</span></div>
+            <div class="inventory-layout"><div class="table-panel"><div class="panel-toolbar"><label class="search-field"><span>搜索商品</span><input id="product-search" type="search" maxlength="64" placeholder="输入商品 ID" autocomplete="off"></label><button id="refresh-products" class="small-button" type="button">刷新 ↻</button></div><div class="table-scroll"><table><thead><tr><th>商品 ID</th><th class="number-cell">现存数量</th><th>操作</th></tr></thead><tbody id="product-rows"><tr><td colspan="3" class="empty-cell">正在载入…</td></tr></tbody></table></div><div class="pagination"><span id="products-count">—</span><div><button id="products-prev" type="button" class="page-button" aria-label="上一页">←</button><span id="products-page">—</span><button id="products-next" type="button" class="page-button" aria-label="下一页">→</button></div></div></div>
+              <form id="stock-form" class="action-panel"><span class="panel-eyebrow">QUICK ACTION / 库存调整</span><h3>记录一笔变动</h3><label>商品 ID<input id="stock-id" name="product_id" maxlength="64" required placeholder="例如 SKU-001" autocomplete="off"></label><label>数量<input id="stock-quantity" name="quantity" type="number" min="1" max="1000000000" step="1" required placeholder="请输入正整数"></label><div class="action-buttons"><button id="add-stock" type="submit" value="add" class="button button-primary">＋ 入库</button><button id="remove-stock" type="submit" value="remove" class="button button-light">－ 出库</button></div><p class="subtle">出库不会让库存变为负数。删除商品需在列表中再次确认。</p></form></div>
+          </section>
+
+          <section id="movements" class="section-block"><div class="section-header"><div><span class="section-index">02 / AUDIT TRAIL</span><h2>出入库流水</h2><p>最近操作在前；即使商品已删除，原有流水仍保留。</p></div></div><div class="table-panel"><div class="panel-toolbar"><label class="search-field"><span>筛选商品</span><input id="movement-filter" type="search" maxlength="64" placeholder="留空查看全部" autocomplete="off"></label><button id="refresh-movements" type="button" class="small-button">查询 ↗</button></div><div class="table-scroll"><table><thead><tr><th>时间（UTC+7）</th><th>商品 ID</th><th>类型</th><th class="number-cell">数量</th></tr></thead><tbody id="movement-rows"><tr><td colspan="4" class="empty-cell">正在载入…</td></tr></tbody></table></div><div class="pagination"><span id="movements-count">—</span><div><button id="movements-prev" type="button" class="page-button" aria-label="上一页">←</button><span id="movements-page">—</span><button id="movements-next" type="button" class="page-button" aria-label="下一页">→</button></div></div></div></section>
+
+          <section id="statistics" class="section-block"><div class="section-header"><div><span class="section-index">03 / DAILY REPORT</span><h2>每日统计</h2><p>选择日期范围，查看每天的入库与出库总量；最多查询 366 天。</p></div><span class="section-tag">UTC+7</span></div><div class="stats-panel"><form id="stats-form" class="date-form"><label>开始日期<input id="stats-start" type="date" required></label><label>结束日期<input id="stats-end" type="date" required></label><button class="button button-primary" type="submit">生成日报 →</button></form><div id="stats-summary" class="stats-summary"></div><div id="stats-list" class="stats-list"><p class="empty-cell">选择日期查看日报。</p></div></div></section>
+          <footer class="footer"><span>库存管理台 / 记录每一笔变动</span><a href="https://t.me/kucunxbot" target="_blank" rel="noopener noreferrer">@kucunxbot ↗</a></footer>
+        </div>
+      </main>
+    </div>
+  </div>
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+</body>
+</html>
