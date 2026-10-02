@@ -10,7 +10,7 @@ deploy:
   stage: deploy
   needs: [test]
   rules:
-    - if: '$CI_COMMIT_BRANCH == "main"'
+    - if: '$CI_COMMIT_BRANCH == "main" && $ENABLE_SELF_HOST_DEPLOY == "true"'
   before_script:
     - apk add --no-cache openssh-client rsync
     - mkdir -p ~/.ssh && chmod 700 ~/.ssh

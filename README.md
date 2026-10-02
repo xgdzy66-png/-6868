@@ -61,7 +61,7 @@ docker compose exec -T app python -m scripts.claim_code
 
 ## GitHub / GitLab CI/CD
 
-本项目包含 `.github/workflows/deploy.yml` 和 `.gitlab-ci.yml` 示例。它们先运行测试，再将代码复制到你**已授权且预先配置**的 Linux 服务器，调用上述部署脚本。先在服务器的 `/srv/kucunbot/.env` 保存私密配置；在 GitHub Actions Secrets 或 GitLab Protected Variables 中配置 `DEPLOY_HOST`、`DEPLOY_USER`、`SSH_PRIVATE_KEY`、`SSH_KNOWN_HOSTS`。`SSH_KNOWN_HOSTS` 应从可信渠道核对服务器公钥指纹，勿在 CI 中临时信任未经验证的主机。服务器用户必须有 `/srv/kucunbot` 写权限和 Docker 使用权限。提交 `main` 时会触发 CI；GitHub 手动触发也只允许从 main 部署，建议为生产环境设置审批与保护分支。如果仅想手动发布，请关闭自动部署 job。托管发布与自建 CI 是**两条可选路线**，不要同时将同一个 Telegram Bot Webhook 切向不同部署。GitHub/GitLab 仓库连接需要账户所有者单独授权；这里提供可直接提交的配置，不表示已替你创建仓库。
+本项目包含 `.github/workflows/deploy.yml` 和 `.gitlab-ci.yml` 示例。它们先运行测试；**自建部署任务默认关闭**，只有你在目标仓库设置 `ENABLE_SELF_HOST_DEPLOY=true`（GitHub Repository Variable / GitLab Protected Variable）后才将代码复制到**已授权且预先配置**的 Linux 服务器并调用部署脚本。先在服务器的 `/srv/kucunbot/.env` 保存私密配置；在 GitHub Actions Secrets 或 GitLab Protected Variables 中配置 `DEPLOY_HOST`、`DEPLOY_USER`、`SSH_PRIVATE_KEY`、`SSH_KNOWN_HOSTS`。`SSH_KNOWN_HOSTS` 应从可信渠道核对服务器公钥指纹，勿在 CI 中临时信任未经验证的主机。服务器用户必须有 `/srv/kucunbot` 写权限和 Docker 使用权限。提交 `main` 时会触发测试；GitHub 手动触发也只允许从 main 部署，建议为生产环境设置审批与保护分支。托管发布与自建 CI 是**两条可选路线**，不要同时将同一个 Telegram Bot Webhook 切向不同部署。GitHub/GitLab 仓库连接需要账户所有者单独授权；这里提供可直接提交的配置，不表示已替你创建仓库。
 
 ## 安全、测试与维护
 
