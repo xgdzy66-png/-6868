@@ -1,0 +1,23 @@
+stages: [test, deploy]
+test:
+  image: python:3.11-slim
+  stage: test
+  script:
+    - pip install -r requirements.txt
+    - python -m pytest -q
+deploy:
+  image: alpine:3.20
+  stage: deploy
+  needs: [test]
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+  before_script:
+    - apk add --no-cache openssh-client rsync
+    - mkdir -p ~/.ssh && chmod 700 ~/.ssh
+    - printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
+    - printf '%s\n' "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+    - chmod 600 ~/.ssh/id_ed25519 ~/.ssh/known_hosts
+  script:
+    - ssh "$DEPLOY_USER@$DEPLOY_HOST" 'mkdir -p /srv/kucunbot'
+    - rsync -az --delete-delay --exclude=.git --exclude='.env*' --exclude=.venv --exclude=data --exclude=__pycache__ --exclude='*.db' ./ "$DEPLOY_USER@$DEPLOY_HOST:/srv/kucunbot/"
+    - ssh "$DEPLOY_USER@$DEPLOY_HOST" 'cd /srv/kucunbot && ./scripts/deploy.sh'

@@ -1,0 +1,14 @@
+.git
+.github
+.gitlab-ci.yml
+.venv
+.env
+.env.*
+!.env.example
+__pycache__
+*.pyc
+.pytest_cache
+*.db
+*.sqlite*
+data
+.coverage
