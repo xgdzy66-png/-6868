@@ -1,0 +1,9 @@
+{
+  "include": ["tg_console"],
+  "exclude": [".venv", "console-data", "console-demo-data"],
+  "venvPath": ".",
+  "venv": ".venv",
+  "extraPaths": ["."],
+  "typeCheckingMode": "basic",
+  "reportMissingTypeStubs": false
+}

@@ -1,0 +1,22 @@
+name: Test Telegram AI chat
+on:
+  push:
+    paths: ['ai-chat/**', '.github/workflows/ai-chat-tests.yml']
+  pull_request:
+    paths: ['ai-chat/**', '.github/workflows/ai-chat-tests.yml']
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ai-chat
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install -r requirements.txt pytest==8.4.2
+      - run: python -m pytest -q
+      - run: python -m tg_ai demo

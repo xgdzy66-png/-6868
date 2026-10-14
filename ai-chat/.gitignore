@@ -1,0 +1,16 @@
+.env
+.env.*
+!.env.example
+data/
+console-data/
+console-demo-data/
+master.key
+*.session
+*.session-*
+*.db
+*.sqlite3*
+*.lock
+.venv/
+__pycache__/
+.pytest_cache/
+*.pyc
