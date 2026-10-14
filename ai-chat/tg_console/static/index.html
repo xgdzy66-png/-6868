@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="light">
+  <meta name="theme-color" content="#f4f6f8">
+  <title>TG Atelier · 控制台</title>
+  <link rel="stylesheet" href="/static/console.css">
+</head>
+<body>
+  <main id="app" aria-live="polite">
+    <section class="loading-shell" aria-label="正在验证会话">
+      <div class="loading-mark" aria-hidden="true">A</div>
+      <p>正在验证安全会话</p>
+    </section>
+  </main>
+  <div id="toast-region" class="toast-region" aria-live="assertive" aria-atomic="true"></div>
+  <script type="module" src="/static/console.js"></script>
+</body>
+</html>

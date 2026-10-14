@@ -1,0 +1,21 @@
+[Unit]
+Description=TG Atelier multi-account AI dashboard
+After=network-online.target
+Wants=network-online.target
+StartLimitIntervalSec=300
+StartLimitBurst=5
+
+[Service]
+Type=simple
+WorkingDirectory=%h/tg-ai-steward
+ExecStart=%h/tg-ai-steward/.venv/bin/python -m tg_console serve --host 127.0.0.1 --port 8080
+Restart=always
+RestartSec=20
+KillSignal=SIGINT
+TimeoutStopSec=60
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=default.target
