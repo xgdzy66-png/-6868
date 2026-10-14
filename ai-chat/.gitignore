@@ -1,0 +1,13 @@
+.env
+.env.*
+!.env.example
+data/
+*.session
+*.session-*
+*.db
+*.sqlite3*
+*.lock
+.venv/
+__pycache__/
+.pytest_cache/
+*.pyc

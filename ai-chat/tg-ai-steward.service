@@ -1,0 +1,21 @@
+[Unit]
+Description=Telegram personal account AI chat steward
+After=network-online.target
+Wants=network-online.target
+StartLimitIntervalSec=300
+StartLimitBurst=5
+
+[Service]
+Type=simple
+WorkingDirectory=%h/tg-ai-steward
+ExecStart=%h/tg-ai-steward/.venv/bin/python -m tg_ai run
+Restart=always
+RestartSec=20
+KillSignal=SIGINT
+TimeoutStopSec=50
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=default.target
